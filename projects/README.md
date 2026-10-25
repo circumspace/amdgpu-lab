@@ -41,7 +41,9 @@ an MTP head onto a Bonsai target. Source-only (build `-DGGML_HIP=ON`, ROCm clang
   on a dense 27B stays bandwidth-bound, so it likely won't beat the MoE Qwen as a
   daily driver.
 - Correctness quoted: Bonsai-27B Q2_0 g128 PPL 10.1465. Hackathon-stage, no
-  license stated, no prebuilt binaries.
+  prebuilt binaries. **MIT** — the LICENSE is kept at the `rock8-v1` tag (ggml
+  authors); new kernels default to MIT, and any ported from Bonsai's Apache-2.0
+  code are permissively compatible.
 
 ## Firmware and scheduling
 
