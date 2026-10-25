@@ -1,23 +1,44 @@
-# radeon7900
+# amdgpu-lab
 
-Findings and a bring-up plan for running local LLMs on the AMD RX 7900 XTX
-(gfx1100, RDNA3), targeting the `benchmark-host` host.
+AMD GPU inference experiments: running local LLMs on Radeon, plus the firmware
+and scheduler work around it. Private; source of truth is Gitea
+(`circumspace/amdgpu-lab`), no mirror.
 
-Private. Source of truth is Gitea (`circumspace/radeon7900`); no mirror.
+Per-architecture work lives under `rdna2/` and `rdna3/`; everything that spans
+both sits at the top level.
 
 ## Layout
 
-- `notes/` — background and imported analyses
-  - `worm.md` — tinygrad's persistent-scheduler experiment
-  - `firmware.md` — on-card firmware blocks and the PSP reimplementation goal
-  - `astra-findings.md`, `astra-comparison.md` — Sapphire Pulse firmware diff
-- `projects/` — external projects inspected, with a verdict each
-- `plan/` — the benchmark-host bring-up plan and open questions
+```
+rdna2/                 RX 6700 XT (gfx1031) — current host
+  specs/               host and card facts
+  runs/                Containerfiles and sweep scripts (reproducible)
+  benchmarks/          measured numbers
+  results/             verdicts and comparisons
+rdna3/                 RX 7900 XTX (gfx1100) — target card
+  specs/               card facts
+  benchmarks/          third-party numbers (none measured yet)
+  bringup.md           ordered bring-up plan for benchmark-host
+  open-questions.md    what's unresolved
+projects/              external projects inspected, with a verdict each
+firmware/              on-card firmware blocks; imported Astra PSP analysis
+docs/                  cross-cutting notes — Worm scheduler, Bonsai method
+```
+
+## Status
+
+- **RDNA2 (6700 XT):** production is Qwen3.6-35B-A3B IQ4_XS on ROCm. Bonsai 27B
+  measured on Vulkan — fits a dense 27B + 110K context in VRAM but decodes at
+  ~14 t/s, too slow to replace Qwen. See
+  [rdna2/results/bonsai-vs-qwen.md](rdna2/results/bonsai-vs-qwen.md).
+- **RDNA3 (7900 XTX):** not yet bought. The plan is in
+  [rdna3/bringup.md](rdna3/bringup.md); the key expected win is running the
+  existing IQ4_XS fully in 24 GB VRAM with no CPU-expert offload.
 
 ## Two tracks
 
-1. **Inference now.** Get the best batch-1 decode out of the card with existing
-   runtimes (llama.cpp forks, tinygrad, vLLM ROCm). Measured on `benchmark-host`.
-2. **Firmware and scheduling.** The longer bet: a persistent GPU scheduler
-   (Worm) and, further out, reimplementing on-card firmware. PSP code execution
-   is the precondition for the firmware half.
+1. **Inference** — get the best local LLM out of each card (llama.cpp forks,
+   ExLlamaV3, tinygrad, vLLM). See `projects/` and the per-arch `benchmarks/`.
+2. **Firmware and scheduling** — the longer bet: tinygrad's Worm persistent
+   scheduler and reimplementing on-card firmware (PSP code execution is the
+   gate). See `docs/worm.md` and `firmware/`.

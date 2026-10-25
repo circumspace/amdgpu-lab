@@ -25,8 +25,8 @@ the current RDNA2 6700 XT; no 7900 XTX is in hand yet.
 
 | Project | What it is | Verdict |
 |---|---|---|
-| tinygrad Worm | Persistent GPU scheduler, all 96 CUs | The direction. See [../notes/worm.md](../notes/worm.md) |
-| PSP reimplementation | Run our own code on the Platform Security Processor | Long bet; precondition for replacing any on-card firmware. See [../notes/firmware.md](../notes/firmware.md) |
+| tinygrad Worm | Persistent GPU scheduler, all 96 CUs | The direction. See [../docs/worm.md](../docs/worm.md) |
+| PSP reimplementation | Run our own code on the Platform Security Processor | Long bet; precondition for replacing any on-card firmware. See [../firmware/README.md](../firmware/README.md) |
 | Zagitta/gpu-unlock | Firmware unlock | Doesn't apply: 7900 XTX and W7900 share ~123 TFLOPS FP16; only the power cap matters |
 
 ## RDNA2 playground (current 6700 XT, until the XTX arrives)

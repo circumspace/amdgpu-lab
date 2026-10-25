@@ -1,0 +1,16 @@
+# Ternary Bonsai-27B on Vulkan/RADV (RDNA2+), container pattern matching llm-llama.
+# Build-only deps in the builder stage; runtime carries just RADV + the llama.cpp libs.
+FROM alpine:3.21 AS build
+RUN apk add --no-cache git cmake make g++ linux-headers \
+      vulkan-headers vulkan-loader-dev shaderc shaderc-dev spirv-headers glslang
+ARG REF=62061f910
+RUN git clone --filter=blob:none https://github.com/PrismML-Eng/llama.cpp /src \
+ && git -C /src checkout "$REF"
+RUN cmake -S /src -B /src/build -DGGML_VULKAN=1 -DGGML_NATIVE=OFF -DCMAKE_BUILD_TYPE=Release \
+ && cmake --build /src/build --target llama-bench llama-server llama-cli -j"$(nproc)"
+
+FROM alpine:3.21
+RUN apk add --no-cache mesa-vulkan-ati vulkan-loader libstdc++ libgomp curl
+COPY --from=build /src/build/bin/ /usr/local/bin/
+ENV LD_LIBRARY_PATH=/usr/local/bin
+ENTRYPOINT ["/usr/local/bin/llama-bench"]
