@@ -30,7 +30,11 @@ What the paper does establish:
 
 - The **KV-mean-center** calibration only — K-cache centering for 4-bit KV, not
   weight quant (`PrismML-Eng/llama.cpp tools/kv-mean-center/`, Issue #54).
-- The **inference kernels** (MLX, CUDA; the community Vulkan fork we built).
+- The **inference kernels**: prism ships MLX and CUDA; the community adds a RADV
+  Vulkan fork (what we built) and an AMD HIP/ROCm port with the low-bit kernels
+  ([The-Monk rock8](https://github.com/The-Monk/llama.cpp/releases/tag/rock8-v1),
+  gfx1030/1100/1151/1201). So the low-bit *inference* path exists on AMD; only the
+  weight *quantizer* (the rotation + calibration) stays closed.
 
 ## Consequences for a DIY 35B Bonsai
 

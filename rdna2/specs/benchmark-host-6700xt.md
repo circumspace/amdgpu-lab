@@ -19,5 +19,16 @@ itself stays. Bring-up for the new card is in
 - **LLM stack:** rootless podman quadlets as user `local-user` — `llm-llama` (llama-swap
   + llama.cpp ROCm), `llm-gateway`, `llm-health`. GPU via `AddDevice=/dev/dri`
   + `/dev/kfd`, models mounted read-only.
+- **Production build: upstream, not rdna-boosts.** Image
+  `localhost/llm-swap:262-b11804`, built `FROM
+  ghcr.io/ggml-org/llama.cpp:server-rocm-b11804` (official ggml-org ROCm) plus
+  llama-swap 262. `draft-mtp` and `ngram-mod` are mainline features by b11804.
+  rdna-boosts was A/B-tested and rejected for benchmark-host; it never shipped to prod.
+- **Serving config** (llama-swap `config.yaml`): Qwen3.6-35B-A3B heretic MTP
+  IQ4_XS, mmproj F16; `-c 131072 -ctk q8_0 -ctv q8_0 -b 2048 -ub 1024
+  --n-cpu-moe 24 --spec-type draft-mtp,ngram-mod --spec-ngram-mod-n-max 256
+  -ctkd q8_0 -ctvd q8_0 -np 2 -kvu -ctxcp 4`. KV is q8_0 (near-lossless), so
+  prism's Q4_0-only kv-mean-center offers no precision gain here — only a VRAM
+  trade if dropped to q4_0.
 - **Power control:** `power_dpm_force_performance_level` is root-only; forcing it
   high had no measurable effect on Bonsai decode.

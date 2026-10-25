@@ -33,7 +33,8 @@ Target host: `benchmark-host`. The card is not yet bought (no purchase recorded 
 3. A/B ROCm vs Vulkan — RDNA3 is unsettled, and third-party reports conflict
    (victoralcazardev: ROCm 2–3.5× faster; llama.cpp #20934: Vulkan ~20% faster).
 4. Test, each on its own A/B: a pinned rdna-boosts release; SelfRef FP4
-   (optional); ExLlamaV3 + TabbyAPI.
+   (optional); ExLlamaV3 + TabbyAPI; The-Monk rock8 (HIP Bonsai low-bit, gfx1100)
+   if a Bonsai-class model is still of interest.
 5. Tune `-ub 2048`, draft depth, KV q8/q4, reasoning-effort medium + budget.
 6. Check `power1_cap`: the card reportedly defaults to 291 W, not 355 W, on
    Linux.
