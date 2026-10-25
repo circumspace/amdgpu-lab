@@ -28,3 +28,15 @@ the current RDNA2 6700 XT; no 7900 XTX is in hand yet.
 | tinygrad Worm | Persistent GPU scheduler, all 96 CUs | The direction. See [../notes/worm.md](../notes/worm.md) |
 | PSP reimplementation | Run our own code on the Platform Security Processor | Long bet; precondition for replacing any on-card firmware. See [../notes/firmware.md](../notes/firmware.md) |
 | Zagitta/gpu-unlock | Firmware unlock | Doesn't apply: 7900 XTX and W7900 share ~123 TFLOPS FP16; only the power cap matters |
+
+## RDNA2 playground (current 6700 XT, until the XTX arrives)
+
+The 6700 XT is Navi 22, **gfx1031**. Some of these target Navi 21 (gfx1030) and
+won't run unchanged. All single-commit, low-star, self-reported.
+
+| Project | What it is | Runs on the 6700 XT? | Verdict |
+|---|---|---|---|
+| [leapdragon/rdna2-v620-architecture-guide](https://github.com/leapdragon/rdna2-v620-architecture-guide) | 12-chapter docs-only guide to RDNA2 LLM inference (ISA, ROCm/Triton stack, llama.cpp/vLLM deep dives, gotchas) | Reading, yes | **Read it.** Best background for the inference track. Author measures 27B at 40–50 t/s on 2× V620. Says gfx1031 "largely untested", so numbers don't transfer |
+| [FaisalBiyari/vLLM-ALU-RDNA2](https://github.com/FaisalBiyari/vLLM-ALU-RDNA2) | vLLM 0.30 fork adding an RDNA2 attention backend + decode GEMMs | No — gfx1030 (W6800/V620) only, validated on 4-die TP4, fp16 27B | Note for later. Closest thing to working vLLM on RDNA2, but not for this card, and fp16 27B won't fit 12 GB. Revisit if vLLM matters |
+| [Maxritz/ROCr-LLM-RDNA2](https://github.com/Maxritz/ROCr-LLM-RDNA2) | From-scratch GGUF engine driving the GPU via raw ROCr/HSA, hand-written gfx1031 kernels, no HIP | **Yes — targets the 6700 XT directly** | **The real playground piece.** ~23 t/s on Llama-1B Q8_0, author estimates a ~380 t/s memory-bound ceiling, gap is host round-trips. Same lesson as Worm: kill the round-trips. Research toy, not a server |
+| [RamenFast/bonsai27b-vulkan](https://github.com/RamenFast/bonsai27b-vulkan) | install/run scripts for Ternary Bonsai-27B (1.71 bpw, 7.17 GB) on a llama.cpp fork via Mesa RADV Vulkan | **Yes — RX 6000 via RADV, tested on 6750 XT** | **Try it.** A 27B that fits 12 GB with room for ~110K context; 25–40 t/s claimed. Easy win on the current card, and a Vulkan/RADV data point for the XTX later |
