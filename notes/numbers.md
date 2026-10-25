@@ -36,3 +36,31 @@ Production: Qwen3.6-35B-A3B heretic MTP IQ4_XS, `--n-cpu-moe 24`, upstream b1180
 - **ngram-mod with experts in RAM:** −3–7% fresh code, ~3× faster rewrites. Kept.
 
 Note: these are RDNA2 results. RDNA3's WMMA paths are untested and must get their own A/B — RDNA2 rejections do not carry over.
+
+### bonsai27b, measured on the 6700 XT (2026-10-25)
+
+Ternary-Bonsai-27B Q2_0 (6.66 GiB, dense 27B, all layers on GPU), PrismML fork
+62061f91, Vulkan/RADV, `llama-bench -ngl 99 -fa 1 -r 3`. Container:
+`localhost/bonsai-vulkan`, `--device /dev/dri`. Production stopped for the run.
+
+| test | t/s |
+|---|---|
+| pp512 | 164.96 |
+| pp2048 | 155.23 |
+| tg128 @ d0 | 13.78 |
+| pp512 @ d8192 | 134.92 |
+| pp2048 @ d8192 | 133.45 |
+| tg128 @ d8192 | 21.12 |
+
+RADV reports NAVI22, fp16 yes, no matrix cores (expected for RDNA2).
+
+Two reads:
+- **The whole dense 27B fits in 6.66 GiB** with no CPU offload — the opposite of
+  the production MoE, which spills experts to RAM. Leaves ~5 GiB for context.
+- **Decode is clock-gated.** tg128 is 13.78 cold (d0) but 21.12 after an 8K
+  prefill — the GPU sat at a low power state until the prefill ramped it. This is
+  the RDNA2 Vulkan clock-sag seen in victoralcazardev's data. Forcing
+  `power_dpm_force_performance_level=high` should lift the cold number.
+- Author claimed 25–40 t/s decode on a 6750 XT; 21 warm on a slower 6700 XT with
+  sag unfixed is consistent. The DSpark drafter (speculative decode, shipped but
+  not yet tested) is the likely path to the upper range.
