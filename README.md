@@ -31,8 +31,11 @@ docs/                  cross-cutting notes — Worm scheduler, Bonsai method
   measured on Vulkan — fits a dense 27B + 110K context in VRAM but decodes at
   ~14 t/s, too slow to replace Qwen. See
   [rdna2/results/bonsai-vs-qwen.md](rdna2/results/bonsai-vs-qwen.md).
-- **RDNA3 (7900 XTX):** not yet bought. The plan is in
-  [rdna3/bringup.md](rdna3/bringup.md); the key expected win is running the
+- **RDNA3 (7900 XTX):** not yet bought. Bring-up steps in
+  [rdna3/bringup.md](rdna3/bringup.md); the north star for the engine —
+  composition search space, the open QuaRot→rock8 rotation-quant pipeline, and
+  the measurement-driven method — is in
+  [rdna3/engine-design.md](rdna3/engine-design.md). The first win is running the
   existing IQ4_XS fully in 24 GB VRAM with no CPU-expert offload.
 
 ## Two tracks
