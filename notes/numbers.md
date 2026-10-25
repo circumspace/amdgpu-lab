@@ -54,13 +54,32 @@ Ternary-Bonsai-27B Q2_0 (6.66 GiB, dense 27B, all layers on GPU), PrismML fork
 
 RADV reports NAVI22, fp16 yes, no matrix cores (expected for RDNA2).
 
-Two reads:
+Reads:
 - **The whole dense 27B fits in 6.66 GiB** with no CPU offload — the opposite of
   the production MoE, which spills experts to RAM. Leaves ~5 GiB for context.
-- **Decode is clock-gated.** tg128 is 13.78 cold (d0) but 21.12 after an 8K
-  prefill — the GPU sat at a low power state until the prefill ramped it. This is
-  the RDNA2 Vulkan clock-sag seen in victoralcazardev's data. Forcing
-  `power_dpm_force_performance_level=high` should lift the cold number.
-- Author claimed 25–40 t/s decode on a 6750 XT; 21 warm on a slower 6700 XT with
-  sag unfixed is consistent. The DSpark drafter (speculative decode, shipped but
-  not yet tested) is the likely path to the upper range.
+- The 21.12 at d8192 was a first-run warmup artifact, not a trend; steady decode
+  is ~14 t/s (see the 30-min sweep).
+
+### 30-min sweep, 6700 XT (2026-10-25)
+
+Clock pinned high (`power_dpm_force_performance_level=high`), q8_0 KV for depth.
+
+| phase | result |
+|---|---|
+| decode @ high power, d0 | tg128 **13.78** — identical to auto power |
+| prefill, d0 | pp512 163.8 |
+| decode @ 32K / 64K | tg64 15.6 / 13.75 |
+| prefill @ 32K / 64K | pp512 105 / 77 |
+| 110K context fit (q8_0 KV) | **loads, 10.91 GiB VRAM** |
+| DSpark drafter | not measured — fork renamed `--draft-max` to `--spec-draft-n-max`; retry pending |
+
+Corrected reads:
+- **Clock-sag was the wrong diagnosis.** Forcing the card high left decode at
+  13.78, unchanged. Steady decode is ~14 t/s regardless of power state or depth.
+- **Decode barely feels depth** (13.75 at 64K), matching prism's claim. Prefill
+  degrades with depth as expected.
+- **110K context fits fully on-GPU** at 10.91/12 GiB with q8_0 KV — the repo's
+  claim holds on a 6700 XT.
+- Decode (~14 t/s) is well below the production MoE's 28–44 t/s. The DSpark
+  drafter is the remaining lever, and prism's own ledger warns its Q2_0+Vulkan
+  pairing is unproven. Restore power with `…=auto` after testing.
