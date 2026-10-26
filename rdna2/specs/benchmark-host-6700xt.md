@@ -32,3 +32,9 @@ itself stays. Bring-up for the new card is in
   trade if dropped to q4_0.
 - **Power control:** `power_dpm_force_performance_level` is root-only; forcing it
   high had no measurable effect on Bonsai decode.
+- **Profiling:** rocprofv3 1.1.0 ships in the production image (ROCm 7.2.1 base)
+  but needs `libdw1t64`, which the runtime image lacks; install it in a
+  throwaway container. Works on gfx1031 run as gfx1030 (2026-10-26): kernel
+  trace with per-kernel times and VGPR/SGPR counts, HIP API trace, and hardware
+  counters (`SQ_WAVES`, `GRBM_GUI_ACTIVE`). Memory-copy trace is untested; the
+  test kernel copies nothing. Check: [../runs/profile-check.sh](../runs/profile-check.sh).
