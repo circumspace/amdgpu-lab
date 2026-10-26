@@ -29,6 +29,8 @@ gain at full quality (see [../../rdna3/bringup.md](../../rdna3/bringup.md)).
 
 RDNA2 rejections do not carry to RDNA3 — the WMMA paths need their own A/B.
 
+Agent benchmark on fresh multi-language tasks: [swebench-live.md](swebench-live.md).
+
 ## Where generation time goes (2026-10-26)
 
 Production flags, upstream b11804, single-channel RAM.
