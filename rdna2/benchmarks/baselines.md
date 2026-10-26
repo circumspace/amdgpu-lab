@@ -28,3 +28,27 @@ gain at full quality (see [../../rdna3/bringup.md](../../rdna3/bringup.md)).
 - **ngram-mod with experts in RAM:** −3–7% fresh code, ~3× faster rewrites. Kept.
 
 RDNA2 rejections do not carry to RDNA3 — the WMMA paths need their own A/B.
+
+## Where generation time goes (2026-10-26)
+
+Production flags, upstream b11804, single-channel RAM.
+
+- **GPU busy while generating:** 18–53 % in passive snapshots, at 73–134 W.
+  Reading a 117K prompt holds 99 % at 185 W. The GPU waits on the 24 CPU-held
+  expert layers for much of each token.
+- **`HSA_ENABLE_SDMA=0`:** generation level within ±5 %, prompt reading
+  2–4 % slower. The small CPU↔GPU copies per token are not a measurable cost.
+- **HIP graphs** (`GGML_CUDA_GRAPH_DEBUG=1`, needs `--verbose`; `-lv 4` shows
+  nothing): reused for 99 % of launches on fresh code, 97 % on chat, 96 % on
+  rewrites. Resets follow the changing draft-verify batch sizes.
+- **`--no-cache-idle-slots` with `-np 2 -kvu`:** a 117K conversation held in one
+  slot slowed fresh code in the other from 42 to 26 tok/s. Removed from prod.
+- **DSpark** (RedHatAI drafter, Q8_0, `--spec-draft-n-ubatch 256`,
+  `--spec-ngram-mod-n-match 64`): level with MTP + n-gram on chat, fresh code
+  and rewrites; ~190 MiB more VRAM free. Rejected for benchmark-host.
+- **Expert cache** (`--moe-cache-mib 512`, 2026-10-19, q4_0 KV): slower than no
+  cache on every probe; no hit-rate stats captured. Not retried.
+
+Custom HIP kernels for RDNA2 would only speed up the GPU share, roughly half of
+generation at best, on a card being retired. Kernel-time breakdowns belong on
+the 7900 XTX, where the whole model is GPU-resident.
