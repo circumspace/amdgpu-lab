@@ -27,8 +27,9 @@ docs/                  cross-cutting notes — Worm scheduler, Bonsai method
 
 ## Status
 
-- **RDNA2 (6700 XT):** production is Qwen3.6-35B-A3B IQ4_XS on ROCm with
-  DSpark + n-gram and 64 GiB dual-channel RAM. The
+- **RDNA2 (6700 XT):** production is the heretic
+  [Qwen3.6-35B-A3B IQ4_XS](https://huggingface.co/hermeticvm/Qwen3.6-35B-A3B-heretic-MTP-IQ4_XS-GGUF)
+  on ROCm with DSpark + n-gram and 64 GiB dual-channel RAM. The
   [Qwen3.6 measurements](rdna2/benchmarks/qwen36.md) cover the RAM upgrade,
   speculation, backend comparisons and the rdna-boosts fork. The
   [Qwen3.8 Flash Next experiment](rdna2/benchmarks/qwen38.md) is not deployed.
