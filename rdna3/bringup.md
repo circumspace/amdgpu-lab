@@ -10,7 +10,7 @@ Target host: `benchmark-host`. The card is not yet bought (no purchase recorded 
   when M.2_2 is populated. (The board is **not** "2x PCIe 4.0" — an earlier
   pitch draft got this wrong.)
 - OS: Omarchy (Arch), bare metal. SDDM/Hyprland disabled to free VRAM.
-- Stack: podman quadlets as user `local-user`, llama-swap, Python gateway, `llm-llama`.
+- Stack: rootless podman quadlets, llama-swap, Python gateway, `llm-llama`.
 - Current GPU: RX 6700 XT Red Devil, 12 GB, run as gfx1030. To be sold, not
   kept as a second card.
 - RAM: 64 GiB dual-channel at 3200 MT/s, measured 2026-10-28; see

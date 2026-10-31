@@ -16,7 +16,7 @@ itself stays. Bring-up for the new card is in
   Governor `performance`, THP `always`, Resizable BAR off.
 - **Graphics stack:** Mesa + vulkan-radeon 26.2.5 (RADV). `/dev/dri/renderD128`
   for Vulkan; `/dev/kfd` for ROCm.
-- **LLM stack:** rootless podman quadlets as user `local-user` — `llm-llama` (llama-swap
+- **LLM stack:** rootless podman quadlets — `llm-llama` (llama-swap
   + llama.cpp ROCm), `llm-gateway`, `llm-health`. GPU via `AddDevice=/dev/dri`
   + `/dev/kfd`, models mounted read-only.
 - **Production build: upstream, not rdna-boosts.** Image

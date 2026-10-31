@@ -1,8 +1,8 @@
 # amdgpu-lab
 
 AMD GPU inference experiments: running local LLMs on Radeon, plus the firmware
-and scheduler work around it. Private; source of truth is Gitea
-(`circumspace/amdgpu-lab`), no mirror.
+and scheduler work around it. The source repository is
+[`circumspace/amdgpu-lab`](https://git.circum.space/circumspace/amdgpu-lab).
 
 Per-architecture work lives under `rdna2/` and `rdna3/`; everything that spans
 both sits at the top level.

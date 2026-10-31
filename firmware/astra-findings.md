@@ -1,5 +1,10 @@
 # What changed in Sapphire's RX 7900 XTX security firmware
 
+This is an AI-assisted report imported from a separate research workspace.
+The detailed reports, tools, test outputs and firmware files referenced below
+are not in this repository; the results have not been independently reproduced
+here.
+
 ## Executive result
 
 **The encrypted firmware was successfully decrypted.** Comparing the recovered code reveals concrete security hardening in the PSP stage-2 bootloader: integer-overflow rejection, narrower register-access permissions, and more complete supervisor-call buffer validation. The update also includes initialization changes unrelated to any proven vulnerability.
@@ -20,13 +25,13 @@ The scheme is:
 
 **All four recovered bodies match exactly.** Independent ARM-vector, CP15/VBAR, and ARM/Thumb control-flow checks corroborate the result. The alternative published Zen key fails all four digest checks. This is verified plaintext, not a plausible-looking entropy reduction.
 
-Recovered files are in `decryption/output/{old,new}-000{1,2}.plaintext.bin`. They contain bodies only. Complete hashes, source revision, algorithm, negative controls, tests, and reproduction commands are in [decryption/REPORT.md](decryption/REPORT.md).
+Recovered files were recorded in the original workspace at `decryption/output/{old,new}-000{1,2}.plaintext.bin`. The original `decryption/REPORT.md` contains hashes, source revision, algorithm, negative controls, tests, and reproduction commands.
 
 ### Signature cross-check
 
 All four original encrypted type-1/type-2 images also pass **RSA-4096 PSS with SHA-384** verification over their original header and ciphertext. Type 1 verifies directly against the public key embedded in Sapphire's official new package. Type 2 verifies against a keystore key, and that keystore's signature verifies against the same package's primary key. The old and new key material is identical.
 
-This establishes that the compared old payloads carry valid signatures under the key supplied by the official update, rather than trusting an archive label or body hash alone. It does not establish an independently anchored AMD certificate chain or authenticate every byte of the old board ROM. Reproduction and trust limits are in [signature-analysis/REPORT.md](signature-analysis/REPORT.md).
+This establishes that the compared old payloads carry valid signatures under the key supplied by the official update, rather than trusting an archive label or body hash alone. It does not establish an independently anchored AMD certificate chain or authenticate every byte of the old board ROM. The original workspace's `signature-analysis/REPORT.md` records reproduction and trust limits.
 
 ## Security-relevant changes and their purpose
 
@@ -46,7 +51,7 @@ uint32_t(address + length) > address
 
 **Why it matters:** the old calculation can wrap. For address 0xfffffff0 and length 0x20, the end becomes 0x10, which incorrectly passes the old upper-bound test. The new check rejects that case. It also rejects zero-length buffers.
 
-This function is used by firmware supervisor-call parameter sanitizers. The dispatcher checks sanitizer status before performing the operation. The decoded function moves from old VA 0xa644 to new VA 0xa79c. Exact instructions and predicate test cases: [psp2-analysis/REPORT.md](psp2-analysis/REPORT.md), section 1.
+This function is used by firmware supervisor-call parameter sanitizers. The dispatcher checks sanitizer status before performing the operation. The decoded function moves from old VA 0xa644 to new VA 0xa79c. Exact instructions and predicate test cases are recorded in the original workspace's `psp2-analysis/REPORT.md`, section 1.
 
 This demonstrates a flawed validation predicate and its correction. It is not a demonstrated exploit, and direct host or remote reachability was not established.
 
@@ -64,7 +69,7 @@ The old helpers explicitly implement both `ldrd` and `strd`, so this changes eff
 
 **Why it matters:** permission to access one starting register no longer implicitly permits a doubleword operation extending into the adjacent register. The six allowed addresses are unchanged. Symbolic register names, exploitability, and CVE identity were not established.
 
-Evidence: old validator VA 0x823c, new VA 0x8380; [psp2-analysis/REPORT.md](psp2-analysis/REPORT.md), section 2.
+Evidence: old validator VA 0x823c, new VA 0x8380; the original workspace's `psp2-analysis/REPORT.md`, section 2.
 
 ### 3. Reject wrapped 64-bit flash-metadata offsets
 
@@ -76,7 +81,7 @@ end >= offset
 
 **Why it matters:** a near-maximum 64-bit offset plus 32 can wrap to a small number and pass the old end-bound check. The new unsigned comparison rejects that arithmetic overflow. Normal entries ending at the image boundary remain valid.
 
-Evidence: old VA 0x11264, new VA 0x11818; [psp2-analysis/REPORT.md](psp2-analysis/REPORT.md), section 3. Full host-flashing reachability was not established.
+Evidence: old VA 0x11264, new VA 0x11818; the original workspace's `psp2-analysis/REPORT.md`, section 3. Full host-flashing reachability was not established.
 
 ### 4. Validate more of nested SVC arguments
 
@@ -97,7 +102,7 @@ This is not a proof that every path is safe. One examined local path records a v
 
 New type-1 code clears a retained state marker when neither of two mapped hardware status registers has bit 1 set. Previously the two recognized marker values could bypass an initialization branch without this new gate. There are also additional status tests and delay/control-sequencing changes. This is consistent with tighter retained-state handling, but the register names and vendor rationale remain unknown.
 
-Evidence: [psp1-analysis/REPORT.md](psp1-analysis/REPORT.md).
+Evidence is recorded in the original workspace's `psp1-analysis/REPORT.md`.
 
 ### Hardware initialization
 
@@ -105,7 +110,7 @@ The unencrypted components add a six-instance command/check/retry sequence with 
 
 These are real behavior changes, plausibly concerning hardware initialization reliability. They are not labelled security fixes without an identified trust boundary or vulnerability.
 
-Evidence: [arm-analysis/REPORT.md](arm-analysis/REPORT.md).
+Evidence is recorded in the original workspace's `arm-analysis/REPORT.md`.
 
 ### Display presets and DRAM fields
 
@@ -115,7 +120,7 @@ The 16 changed DRAM bytes are identifiable as **tCCDL** fields. However, the tra
 
 The GOP executable and its signature remain byte-identical to O54; only the outer build label changes.
 
-Evidence: [table-analysis/REPORT.md](table-analysis/REPORT.md) and the ARM report's timing-conversion section.
+Evidence is recorded in the original workspace's `table-analysis/REPORT.md` and the ARM report's timing-conversion section.
 
 ## What can and cannot be concluded
 

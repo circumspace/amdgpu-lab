@@ -1,6 +1,6 @@
 # Sapphire Pulse RX 7900 XTX security firmware comparison
 
-**Follow-up:** the encrypted payloads have now been decrypted and their signatures verified. Instruction-level analysis identifies overflow fixes and narrower register permissions. See [FINDINGS.md](FINDINGS.md) for the current conclusions; this document retains the initial structural comparison and its then-unresolved questions.
+**Follow-up:** the encrypted payloads were decrypted and their signatures verified in the original research workspace. Instruction-level analysis identified overflow fixes and narrower register permissions. See [astra-findings.md](astra-findings.md) for the reported conclusions; this document retains the initial structural comparison and its then-unresolved questions.
 
 ## Result
 
@@ -75,7 +75,8 @@ Unchanged named tables include **smc_dpm_info, smu_info, voltageobject_info, umc
 
 ## Reproduction and limitations
 
-From the workspace root:
+The following commands refer to the original research workspace. Its scripts,
+inputs and test outputs are not included in this repository:
 
 ```sh
 python3 sapphire-firmware-research/compare_ifwi.py \

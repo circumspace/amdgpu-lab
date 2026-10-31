@@ -48,8 +48,8 @@ prompts, and 59.4 / 57.4 tok/s fresh code. It was not deployed.
 Seven-token drafts were slower and left only 30 MiB VRAM headroom in that run.
 They are not a safe production choice.
 
-Sources: `~/llm/eval/dspark35b.out`, `~/llm/eval/b11865.out`,
-[DSpark change](https://github.com/circumspace/infrastructure/pull/337).
+Source logs: `~/llm/eval/dspark35b.out` and `~/llm/eval/b11865.out` on the
+benchmark host; they are not included in this repository.
 
 ## RAM upgrade
 

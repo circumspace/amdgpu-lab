@@ -24,8 +24,10 @@ gets its gains from a persistent kernel.
 
 ## Firmware analyses
 
-ChatGPT Astra analysis of a Sapphire Pulse firmware update, O54 -> W95
-(BIOS .034 -> .045), imported verbatim:
+AI-assisted analysis of a Sapphire Pulse firmware update, O54 -> W95
+(BIOS .034 -> .045), imported from a separate ChatGPT research workspace. The
+underlying tools, firmware files and detailed reports are not in this repository;
+the findings have not been independently reproduced here:
 
 - [astra-findings.md](astra-findings.md): the W95 payloads were decrypted and
   their RSA-4096 signatures verified. The PSP stage-2 changes are real security
@@ -33,9 +35,8 @@ ChatGPT Astra analysis of a Sapphire Pulse firmware update, O54 -> W95
   access narrowed from 8 bytes to 4, and wider validation of nested SVC
   arguments. No CVE, exploit chain or host reachability was shown.
 - [astra-comparison.md](astra-comparison.md): the initial structural diff that
-  located the seven changed firmware payloads. Its internal links name the two
-  reports `FINDINGS.md` and `COMPARISON.md`, their names in the original
-  workspace.
+  located the seven changed firmware payloads. References to supporting reports
+  name files in the original workspace, not files in this repository.
 
 Relevance to the reimplementation goal: these are vendor images, decrypted and
 verified but not executed. They map part of the PSP SVC surface, which is the

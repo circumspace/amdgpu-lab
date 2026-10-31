@@ -1,7 +1,7 @@
 # Bonsai quantization: what the whitepaper reveals
 
-Source: PrismML, "Bonsai 27B" whitepaper (July 2026),
-`github.com/PrismML-Eng/Bonsai-demo/blob/main/bonsai-27b-whitepaper.pdf`.
+Source: PrismML, [Bonsai 27B whitepaper](https://github.com/PrismML-Eng/Bonsai-demo/blob/main/bonsai-27b-whitepaper.pdf)
+(July 2026).
 
 ## The method is not disclosed
 
