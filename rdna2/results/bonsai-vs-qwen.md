@@ -1,7 +1,9 @@
 # Bonsai 27B vs production Qwen — 6700 XT
 
-Both on the 6700 XT. Not apples-to-apples (Vulkan vs ROCm, dense vs MoE, ternary
-vs IQ4_XS), but the verdict is clear on both axes.
+Both were measured on the 6700 XT with single-channel RAM. These historical
+results are not apples-to-apples (Vulkan vs ROCm, dense vs MoE, ternary vs
+IQ4_XS). For later dual-channel Qwen measurements see
+[qwen36.md](../benchmarks/qwen36.md).
 
 | | Bonsai 27B (Vulkan) | Qwen 35B-A3B (ROCm, production) |
 |---|---|---|
@@ -22,14 +24,13 @@ move — clock pinning did nothing, and the drafter is a dead end on Vulkan.
 entirely in VRAM with RAM free. That is its whole case — not speed.
 
 **For benchmark-host:** at ~14 t/s Bonsai is too slow to replace Qwen as the daily
-driver. Its niche is a self-contained, RAM-free 27B. On the 24 GB 7900 XTX the
-footprint edge largely evaporates, so Bonsai stays an experiment, not the plan.
+driver. Its niche is a self-contained, RAM-free 27B. Re-test the footprint
+tradeoff on the 24 GB 7900 XTX; full Qwen residency is not yet measured.
 
 ## Custom ternary 35B — dropped
 
-A ternary MoE 35B would fit fully in VRAM and could roughly 1.5–2× decode on the
-6700 XT by killing the CPU-expert offload. But that gain lands only on the card
-being retired: on the 7900 XTX the existing IQ4_XS fits in 24 GB with no spill,
-so `--n-cpu-moe 0` gets the same no-spill win at full quality and zero new
-tooling. Ternary would trade ~5% quality for a marginal edge, atop an
-unreproducible proprietary quantizer with no shown MoE support. Not worth it.
+A ternary MoE 35B might fit fully in VRAM and reduce CPU-expert offload on the
+6700 XT; the claimed speedup is unmeasured. On a 7900 XTX, first test whether
+the existing IQ4_XS and serving context fit without CPU spill. Ternary would
+trade quality for a possible speed or memory advantage and requires additional
+tooling; the quality tradeoff and MoE support remain unverified here.

@@ -27,16 +27,17 @@ docs/                  cross-cutting notes — Worm scheduler, Bonsai method
 
 ## Status
 
-- **RDNA2 (6700 XT):** production is Qwen3.6-35B-A3B IQ4_XS on ROCm. Bonsai 27B
-  measured on Vulkan — fits a dense 27B + 110K context in VRAM but decodes at
-  ~14 t/s, too slow to replace Qwen. See
-  [rdna2/results/bonsai-vs-qwen.md](rdna2/results/bonsai-vs-qwen.md).
-- **RDNA3 (7900 XTX):** not yet bought. Bring-up steps in
-  [rdna3/bringup.md](rdna3/bringup.md); the north star for the engine —
-  composition search space, the open QuaRot→rock8 rotation-quant pipeline, and
-  the measurement-driven method — is in
-  [rdna3/engine-design.md](rdna3/engine-design.md). The first win is running the
-  existing IQ4_XS fully in 24 GB VRAM with no CPU-expert offload.
+- **RDNA2 (6700 XT):** production is Qwen3.6-35B-A3B IQ4_XS on ROCm with
+  DSpark + n-gram and 64 GiB dual-channel RAM. The
+  [Qwen3.6 measurements](rdna2/benchmarks/qwen36.md) cover the RAM upgrade,
+  speculation, backend comparisons and the rdna-boosts fork. The
+  [Qwen3.8 Flash Next experiment](rdna2/benchmarks/qwen38.md) is not deployed.
+  Bonsai 27B fits with 110K context but is slower; see
+  [bonsai-vs-qwen.md](rdna2/results/bonsai-vs-qwen.md).
+- **RDNA3 (7900 XTX):** not yet bought as of the 2026-10-25 record. Bring-up
+  steps are in [rdna3/bringup.md](rdna3/bringup.md); the engine search space is
+  in [rdna3/engine-design.md](rdna3/engine-design.md). Whether the existing
+  IQ4_XS and serving context fit fully in 24 GB remains to be measured.
 
 ## Two tracks
 

@@ -1,33 +1,25 @@
 # Open questions
 
 - **Card purchase.** None recorded as of 2026-10-25. Target one used 7900 XTX,
-  €800–900. A second only if wanted later (gives two models or two concurrent
-  requests, not single-request speed).
+  €800–900. A second is a separate decision.
 - **PSU rating and case clearance.** Must be read off the hardware.
-- **ROCm vs Vulkan on gfx1100.** Third-party evidence conflicts; settle it by
-  measuring on the card.
-- **Do rdna-boosts WMMA paths win on RDNA3?** RDNA2 rejections do not carry
-  over; needs its own A/B.
-- **Why do r126's llama-bench gains vanish in the server?**
-- **Did the RAM upgrade and the r123 A/B run?** Unconfirmed.
+- **Full GPU residency.** Does Qwen3.6 IQ4_XS fit in 24 GB with the intended
+  128k context, drafter, two slots and safe VRAM headroom? Measure on the card.
+- **ROCm vs Vulkan on gfx1100.** RDNA2 ROCm results do not resolve conflicting
+  third-party RDNA3 reports; measure on the card.
+- **RDNA boosts on RDNA3.** Compare a pinned release against matched upstream,
+  including full-prompt prefill, deep context, decode, output checks and VRAM.
+  On RDNA2 the latest matched test improved shallow chunk-prefill but regressed
+  at 120k; it was not a full-server benchmark. See
+  [Qwen3.6 results](../rdna2/benchmarks/qwen36.md).
+- **Speculation on RDNA3.** Re-test DSpark and n-gram draft lengths and MTP.
+  Seven-token DSpark drafts lost on RDNA2; that result does not transfer to
+  RDNA3.
+- **Qwen3.8 Flash Next.** Retest VRAM, speed, tools, vision and broader agent
+  quality on the XTX. The [RDNA2 trial](../rdna2/benchmarks/qwen38.md) used a
+  Q2 model with CPU-offloaded experts and has only small quality samples.
 
-## Pending stew r123 A/B — likely stale, verify before running
-
-From memory and stew675#214 (closed). The procedure assumed r123; since then
-r126 was tested and rejected, `mkp224o` was stopped and removed (PR #315), and
-r126 needs `LLAMA_SPEC_NGRAM_MOD_BAND_CLAMP=0`. Re-scope before spending time.
-
-Original steps:
-1. Confirm 2/4 memory slots populated.
-2. Use a ghcr `server-rocm-7.14.1` image built after 2026-10-24T10:25Z (the
-   08:30Z build is r122-era). Pin by digest in a copy of
-   `~/llm/swap/Containerfile.rdna`; build `localhost/llm-swap-rdna:262-r123`.
-3. From `~/llm/eval/llm-bench`, with `llm-bench.env` sourced, as a
-   `systemd-run --user` unit:
-   `IDLE_MINUTES=0 PAUSE=mkp224o IMG=localhost/llm-swap-rdna:262-r123 VARIANTS="same ngram-auto arena-ncmoe30 arena-ncmoe34" ./speed/abtest.sh $HOME/llm/gateway/app.py`
-4. Report decode, edit and deep-context numbers plus the `moe_cache_report`
-   lines (arena MiB, `h=`, expert traffic per token). If no arena starts, lower
-   `GGML_CUDA_SLAB_RESERVE_MIB`.
-
-Also scheduled: a SWE-bench-Live run (6 languages, upstream vs r126, 64K) for
-2026-10-26 01:00, results to `~/llm/eval/results/swelive-<date>/`.
+The second RAM DIMM was installed: the 2026-10-28 measurements used 64 GiB
+dual-channel at 3200 MT/s. The pending r123 plan is superseded by the measured
+r126 and later matched-upstream comparisons; their RDNA2 verdicts are not a
+substitute for an RDNA3 test.

@@ -72,9 +72,9 @@ harness, and guardrails* do — which is most of the value. Runs accumulate into
 
 ## Tiers
 
-- **v1 — proven win, low effort.** Upstream HIP + IQ4_XS with `--n-cpu-moe 0`
-  (whole MoE in 24 GB, no CPU spill) + MTP/ngram-mod speculative + rdna-boosts
-  WMMA flash attention. Likely most of the gain, at full quality.
+- **v1 — baseline candidate.** Upstream HIP + IQ4_XS with `--n-cpu-moe 0`,
+  if the model, context and drafter fit with safe headroom. Compare DSpark +
+  n-gram, MTP + n-gram, and a pinned rdna-boosts build against upstream.
 - **v2 — frontier, medium effort.** QuaRot → rock8 rotated low-bit, freeing VRAM
   for a resident drafter + large KV; GDN fusion for the hybrid layers.
 - **v3 — research.** Persistent / megakernel to kill batch-1 launch overhead
@@ -83,13 +83,13 @@ harness, and guardrails* do — which is most of the value. Runs accumulate into
 
 ## Iteration speed on the XTX
 
-The harness itself runs far faster here, which changes how the loop is used:
+Potential iteration-speed gains need measurement on the card:
 
-- ~2.5× bandwidth, more compute, WMMA, and no CPU-expert spill — the slow parts
-  (deep-context KLD/perplexity, cold prefills) collapse.
-- 24 GB runs two variants at once, so A/B stops serializing.
-- The payoff is not just speed but **scope**: the fuller eval suite and more
-  repeats become affordable, so confidence rises, not just throughput.
+- Higher theoretical bandwidth and WMMA may reduce GPU-bound work; measure
+  the actual speedup and whether expert offload is still needed.
+- Whether 24 GB can hold two variants concurrently depends on model and
+  context footprint; do not assume parallel A/B fits.
+- If evaluations are faster, use the time for a fuller suite and more repeats.
 - Fixed costs (model swap, scoring, SWE-bench harness, quantizer runs) don't
   scale with the GPU.
 

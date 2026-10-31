@@ -1,8 +1,11 @@
 # RDNA2 (6700 XT) — measured baselines
 
-tok/s, single user. Host: benchmark-host (see [../specs/benchmark-host-6700xt.md](../specs/benchmark-host-6700xt.md)).
+For the latest dual-channel DSpark, backend and fork comparisons, see
+[qwen36.md](qwen36.md). The numbers below are older single-channel results.
 
-Production: Qwen3.6-35B-A3B heretic MTP IQ4_XS, `--n-cpu-moe 24`, upstream b11804 ROCm.
+Host: benchmark-host (see [../specs/benchmark-host-6700xt.md](../specs/benchmark-host-6700xt.md)).
+The configuration measured below used Qwen3.6-35B-A3B heretic MTP IQ4_XS,
+`--n-cpu-moe 24`, upstream b11804 ROCm, one user.
 
 | Test | tok/s |
 |---|---|
@@ -11,9 +14,9 @@ Production: Qwen3.6-35B-A3B heretic MTP IQ4_XS, `--n-cpu-moe 24`, upstream b1180
 | File rewrite | 173–183 |
 | Fresh code | ~44 |
 
-Decode is limited by the CPU-offloaded experts (`--n-cpu-moe 24`), not the quant.
-On a 24 GB card the whole MoE fits in VRAM — drop the offload for a large decode
-gain at full quality (see [../../rdna3/bringup.md](../../rdna3/bringup.md)).
+CPU-offloaded experts (`--n-cpu-moe 24`) constrain generation on this setup.
+Test whether the whole MoE and serving context fit in 24 GB without CPU
+offload on the 7900 XTX; this has not been measured.
 
 ## rdna-boosts A/B (stew675 fork)
 
@@ -43,12 +46,12 @@ Production flags, upstream b11804, single-channel RAM.
   rewrites. Resets follow the changing draft-verify batch sizes.
 - **`--no-cache-idle-slots` with `-np 2 -kvu`:** a 117K conversation held in one
   slot slowed fresh code in the other from 42 to 26 tok/s. Removed from prod.
-- **DSpark** (RedHatAI drafter, Q8_0, `--spec-draft-n-ubatch 256`,
-  `--spec-ngram-mod-n-match 64`): level with MTP + n-gram on chat, fresh code
-  and rewrites; ~190 MiB more VRAM free. Rejected for benchmark-host.
+- **DSpark**, single-channel: level with MTP + n-gram on chat, fresh code
+  and rewrites, with ~190 MiB more VRAM free. A later dual-channel comparison
+  favored DSpark at deep context and it became the production drafter; see
+  [qwen36.md](qwen36.md).
 - **Expert cache** (`--moe-cache-mib 512`, 2026-10-19, q4_0 KV): slower than no
   cache on every probe; no hit-rate stats captured. Not retried.
 
-Custom HIP kernels for RDNA2 would only speed up the GPU share, roughly half of
-generation at best, on a card being retired. Kernel-time breakdowns belong on
-the 7900 XTX, where the whole model is GPU-resident.
+Custom HIP kernels for RDNA2 would only speed up the GPU share on a card
+being retired. Re-profile on the 7900 XTX if the model fits in GPU memory.
